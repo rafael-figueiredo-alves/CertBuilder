@@ -1,0 +1,10 @@
+bin/
+obj/
+output/
+*.pfx
+*.cer
+*.key
+*.crt
+.vs/
+.idea/
+*.user

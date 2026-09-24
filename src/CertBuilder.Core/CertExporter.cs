@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-namespace CertClientBuilder.Core;
+namespace CertBuilder.Core;
 
 /// <summary>
 /// Exporta certificados (com ou sem chave privada) em formatos comuns:
@@ -37,4 +37,8 @@ public static class CertExporter
 
         File.WriteAllText(keyPath, keyPem);
     }
+
+    /// <summary>Exporta o certificado em PEM (.crt) e sua chave privada em PEM (.key).</summary>
+    public static void ExportCrtAndKey(X509Certificate2 certificate, AsymmetricAlgorithm privateKey, string certPath, string keyPath) =>
+        ExportPem(certificate, privateKey, certPath, keyPath);
 }

@@ -1,7 +1,7 @@
-using CertClientBuilder.Core;
-using CertClientBuilder.Core.Models;
+using CertBuilder.Core;
+using CertBuilder.Core.Models;
 
-namespace CertClientBuilder.Tests;
+namespace CertBuilder.Tests;
 
 /// <summary>
 /// Fábricas pequenas para não repetir setup (CA de teste, opções padrão)

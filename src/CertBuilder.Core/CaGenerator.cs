@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using CertClientBuilder.Core.Models;
+using CertBuilder.Core.Models;
 
-namespace CertClientBuilder.Core;
+namespace CertBuilder.Core;
 
 /// <summary>
 /// Resultado de uma geração de certificado: o certificado com a chave privada anexada
@@ -21,7 +21,8 @@ public static class CaGenerator
     {
         var (key, hash) = KeyFactory.Create(options.KeyAlgorithm);
 
-        var subject = BuildDistinguishedName(options.CommonName, options.Organization, options.Country);
+        var subject = CertificateSubjectBuilder.Build(options.CommonName, options.Organization,
+            options.OrganizationalUnit, options.Country, options.State, options.Locality);
         var request = CertificateRequestFactory.Create(subject, key, hash);
 
         // CA=true habilita esse certificado a assinar outros certificados.
@@ -43,11 +44,4 @@ public static class CaGenerator
         return new GeneratedCertificate(cert, key);
     }
 
-    private static string BuildDistinguishedName(string commonName, string? organization, string? country)
-    {
-        var parts = new List<string> { $"CN={commonName}" };
-        if (!string.IsNullOrWhiteSpace(organization)) parts.Add($"O={organization}");
-        if (!string.IsNullOrWhiteSpace(country)) parts.Add($"C={country}");
-        return string.Join(", ", parts);
-    }
 }

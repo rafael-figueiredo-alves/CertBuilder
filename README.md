@@ -1,4 +1,4 @@
-# CertClientBuilder
+# CertBuilder
 
 > Ferramenta de linha de comando em C#/.NET para gerar, na prática, uma Autoridade Certificadora (CA) raiz e certificados de cliente/servidor — pensada para habilitar **mTLS** entre uma API ASP.NET Core e suas aplicações clientes, e para emitir certificados TLS internos sem depender de uma CA pública.
 
@@ -43,9 +43,9 @@ A API confia em qualquer certificado de cliente assinado pela CA (`ca.cer` insta
 ## Estrutura do projeto
 
 ```
-CertClientBuilder/
+CertBuilder/
 ├── src/
-│   ├── CertClientBuilder.Core/       # Lógica de geração — sem dependência de UI
+│   ├── CertBuilder.Core/       # Lógica de geração — sem dependência de UI
 │   │   ├── Models/CertificateOptions.cs
 │   │   ├── KeyFactory.cs
 │   │   ├── CertificateRequestFactory.cs
@@ -54,18 +54,18 @@ CertClientBuilder/
 │   │   ├── ServerCertGenerator.cs
 │   │   ├── CertExporter.cs
 │   │   └── ThumbprintService.cs
-│   └── CertClientBuilder.Cli/        # Menu interativo (Spectre.Console)
+│   └── CertBuilder.Cli/        # Menu interativo (Spectre.Console)
 │       ├── Program.cs
 │       └── VersionInfo.cs
 ├── tests/
-│   └── CertClientBuilder.Tests/      # Testes de unidade (xUnit) do Core
+│   └── CertBuilder.Tests/      # Testes de unidade (xUnit) do Core
 │       ├── TestFixtures.cs
 │       ├── CaGeneratorTests.cs
 │       ├── ClientCertGeneratorTests.cs
 │       ├── ServerCertGeneratorTests.cs
 │       ├── CertExporterTests.cs
 │       └── ThumbprintServiceTests.cs
-├── CertClientBuilder.sln
+├── CertBuilder.sln
 └── LICENSE
 ```
 
@@ -77,16 +77,16 @@ CertClientBuilder/
 ### Rodando
 
 ```bash
-git clone https://github.com/rafael-figueiredo-alves/CertClientBuilder.git
-cd CertClientBuilder
-dotnet run --project src/CertClientBuilder.Cli
+git clone https://github.com/rafael-figueiredo-alves/CertBuilder.git
+cd CertBuilder
+dotnet run --project src/CertBuilder.Cli
 ```
 
 ### Opções de linha de comando
 
 ```bash
-dotnet run --project src/CertClientBuilder.Cli -- --version   # mostra versão
-dotnet run --project src/CertClientBuilder.Cli -- --about     # mostra sobre + copyright
+dotnet run --project src/CertBuilder.Cli -- --version   # mostra versão
+dotnet run --project src/CertBuilder.Cli -- --about     # mostra sobre + copyright
 ```
 
 ### Rodando os testes
@@ -95,7 +95,24 @@ dotnet run --project src/CertClientBuilder.Cli -- --about     # mostra sobre + c
 dotnet test
 ```
 
-Os testes cobrem apenas o `CertClientBuilder.Core` (geração de CA, certificados de cliente/servidor, exportação e thumbprint) — o projeto `Cli` fica de fora de propósito, por ser só interface.
+Os testes cobrem apenas o `CertBuilder.Core` (geração de CA, certificados de cliente/servidor, exportação e thumbprint) — o projeto `Cli` fica de fora de propósito, por ser só interface.
+
+### Publicando um executável independente
+
+Na raiz do projeto, execute:
+
+```bash
+dotnet publish src/CertBuilder.Cli/CertBuilder.Cli.csproj -c Release
+```
+
+O executável ficará em `src/CertBuilder.Cli/bin/Release/net10.0/win-x64/publish/ccb.exe`.
+Ele é autocontido e single-file: não requer o SDK/runtime do .NET nem outros arquivos da solução para executar.
+
+Para alterar o ícone, coloque um arquivo `certbuilder.ico` em `src/CertBuilder.Cli` antes da publicação. Também é possível usar outro arquivo:
+
+```bash
+dotnet publish src/CertBuilder.Cli/CertBuilder.Cli.csproj -c Release /p:ApplicationIcon=C:\caminho\meu-icone.ico
+```
 
 ### Fluxo típico
 

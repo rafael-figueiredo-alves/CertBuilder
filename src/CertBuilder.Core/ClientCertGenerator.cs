@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using CertClientBuilder.Core.Models;
+using CertBuilder.Core.Models;
 
-namespace CertClientBuilder.Core;
+namespace CertBuilder.Core;
 
 /// <summary>
 /// Gera certificados de CLIENTE, usados pela aplicação cliente para se autenticar
@@ -16,9 +16,8 @@ public static class ClientCertGenerator
     {
         var (key, hash) = KeyFactory.Create(options.KeyAlgorithm);
 
-        var subject = string.IsNullOrWhiteSpace(options.Organization)
-            ? $"CN={options.CommonName}"
-            : $"CN={options.CommonName}, O={options.Organization}";
+        var subject = CertificateSubjectBuilder.Build(options.CommonName, options.Organization,
+            options.OrganizationalUnit, options.Country, options.State, options.Locality);
 
         var request = CertificateRequestFactory.Create(subject, key, hash);
 

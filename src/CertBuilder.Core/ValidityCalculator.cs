@@ -1,6 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
 
-namespace CertClientBuilder.Core;
+namespace CertBuilder.Core;
 
 /// <summary>
 /// Um certificado assinado por uma CA nunca pode ter validade além da própria CA —

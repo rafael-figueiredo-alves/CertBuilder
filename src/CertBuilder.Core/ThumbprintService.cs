@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-namespace CertClientBuilder.Core;
+namespace CertBuilder.Core;
 
 /// <summary>Resumo de um certificado, útil para exibir em tabela no terminal.</summary>
 public sealed record CertificateSummary(

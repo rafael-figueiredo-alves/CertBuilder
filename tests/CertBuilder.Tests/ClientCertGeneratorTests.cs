@@ -1,10 +1,10 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using CertClientBuilder.Core;
-using CertClientBuilder.Core.Models;
+using CertBuilder.Core;
+using CertBuilder.Core.Models;
 using Xunit;
 
-namespace CertClientBuilder.Tests;
+namespace CertBuilder.Tests;
 
 public class ClientCertGeneratorTests
 {

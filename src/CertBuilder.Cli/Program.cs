@@ -1,10 +1,10 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using CertClientBuilder.Core;
-using CertClientBuilder.Core.Models;
+using CertBuilder.Core;
+using CertBuilder.Core.Models;
 using Spectre.Console;
 
-namespace CertClientBuilder.Cli;
+namespace CertBuilder.Cli;
 
 internal static class Program
 {
@@ -22,7 +22,7 @@ internal static class Program
             return 0;
         }
 
-        AnsiConsole.Write(new FigletText("CertClientBuilder").Color(Color.Green));
+        AnsiConsole.Write(new FigletText("CertBuilder").Color(Color.Green));
         AnsiConsole.MarkupLine($"[grey]v{VersionInfo.Version} — {VersionInfo.Copyright}[/]\n");
 
         while (true)
@@ -61,9 +61,12 @@ internal static class Program
 
     private static void RunGenerateCa()
     {
-        var commonName = AnsiConsole.Ask<string>("Nome comum da CA (ex.: [green]Minha CA Raiz[/]):");
-        var organization = AnsiConsole.Ask("Organização (opcional):", string.Empty);
-        var country = AnsiConsole.Ask("País, 2 letras (opcional, ex.: BR):", string.Empty);
+        var commonName = AnsiConsole.Ask("Nome comum da CA:", CertificateDefaults.CaCommonName);
+        var organization = AnsiConsole.Ask("Organização:", CertificateDefaults.Organization);
+        var organizationalUnit = AnsiConsole.Ask("Unidade organizacional:", CertificateDefaults.OrganizationalUnit);
+        var country = AnsiConsole.Ask("País, 2 letras:", CertificateDefaults.Country);
+        var state = AnsiConsole.Ask("Estado:", CertificateDefaults.State);
+        var locality = AnsiConsole.Ask("Localidade:", CertificateDefaults.Locality);
         var years = AnsiConsole.Ask("Validade em anos:", 10);
         var algorithm = AskKeyAlgorithm();
         var password = AnsiConsole.Prompt(new TextPrompt<string>("Senha do arquivo .pfx da CA:").Secret());
@@ -75,7 +78,10 @@ internal static class Program
         {
             CommonName = commonName,
             Organization = string.IsNullOrWhiteSpace(organization) ? null : organization,
-            Country = string.IsNullOrWhiteSpace(country) ? null : country,
+            OrganizationalUnit = string.IsNullOrWhiteSpace(organizationalUnit) ? null : organizationalUnit,
+            Country = string.IsNullOrWhiteSpace(country) ? CertificateDefaults.Country : country,
+            State = string.IsNullOrWhiteSpace(state) ? null : state,
+            Locality = string.IsNullOrWhiteSpace(locality) ? null : locality,
             ValidityYears = years,
             KeyAlgorithm = algorithm,
             PfxPassword = password
@@ -83,13 +89,16 @@ internal static class Program
 
         var pfxPath = Path.Combine(outputDir, "ca.pfx");
         var cerPath = Path.Combine(outputDir, "ca.cer");
+        var crtPath = Path.Combine(outputDir, "ca.crt");
         CertExporter.ExportPfx(ca.Certificate, pfxPath, password);
         CertExporter.ExportPublicCer(ca.Certificate, cerPath);
+        CertExporter.ExportCrtAndKey(ca.Certificate, ca.PrivateKey, crtPath, Path.Combine(outputDir, "ca.key"));
 
         PrintSummary(ca.Certificate);
         AnsiConsole.MarkupLine($"[green]CA gerada com sucesso![/]");
         AnsiConsole.MarkupLine($"  Arquivo com chave privada: [blue]{pfxPath}[/] (guarde com segurança)");
         AnsiConsole.MarkupLine($"  Certificado público (distribuir): [blue]{cerPath}[/]");
+        AnsiConsole.MarkupLine($"  Certificado PEM: [blue]{crtPath}[/]");
     }
 
     private static void RunGenerateLeaf(bool isServer)
@@ -100,8 +109,12 @@ internal static class Program
         var ca = new GeneratedCertificate(caCert, caCert.GetECDsaPrivateKey() as AsymmetricAlgorithm
                                                    ?? caCert.GetRSAPrivateKey()!);
 
-        var commonName = AnsiConsole.Ask<string>("Nome comum (CN):");
-        var organization = AnsiConsole.Ask("Organização (opcional):", string.Empty);
+        var commonName = AnsiConsole.Ask("Nome comum (CN):", CertificateDefaults.LeafCommonName);
+        var organization = AnsiConsole.Ask("Organização:", CertificateDefaults.Organization);
+        var organizationalUnit = AnsiConsole.Ask("Unidade organizacional:", CertificateDefaults.OrganizationalUnit);
+        var country = AnsiConsole.Ask("País, 2 letras:", CertificateDefaults.Country);
+        var state = AnsiConsole.Ask("Estado:", CertificateDefaults.State);
+        var locality = AnsiConsole.Ask("Localidade:", CertificateDefaults.Locality);
         var years = AnsiConsole.Ask("Validade em anos:", 2);
         var algorithm = AskKeyAlgorithm();
         var password = AnsiConsole.Prompt(new TextPrompt<string>("Senha do arquivo .pfx gerado:").Secret());
@@ -112,6 +125,10 @@ internal static class Program
         {
             CommonName = commonName,
             Organization = string.IsNullOrWhiteSpace(organization) ? null : organization,
+            OrganizationalUnit = string.IsNullOrWhiteSpace(organizationalUnit) ? null : organizationalUnit,
+            Country = string.IsNullOrWhiteSpace(country) ? CertificateDefaults.Country : country,
+            State = string.IsNullOrWhiteSpace(state) ? null : state,
+            Locality = string.IsNullOrWhiteSpace(locality) ? null : locality,
             ValidityYears = years,
             KeyAlgorithm = algorithm,
             PfxPassword = password
@@ -141,7 +158,10 @@ internal static class Program
         }
 
         var pfxPath = Path.Combine(outputDir, $"{fileBaseName}.pfx");
+        var crtPath = Path.Combine(outputDir, $"{fileBaseName}.crt");
+        var keyPath = Path.Combine(outputDir, $"{fileBaseName}.key");
         CertExporter.ExportPfx(leaf.Certificate, pfxPath, password);
+        CertExporter.ExportCrtAndKey(leaf.Certificate, leaf.PrivateKey, crtPath, keyPath);
 
         if (Math.Abs((leaf.Certificate.NotAfter - caCert.NotAfter).TotalSeconds) < 2)
         {
@@ -149,7 +169,10 @@ internal static class Program
         }
 
         PrintSummary(leaf.Certificate);
-        AnsiConsole.MarkupLine($"[green]Certificado de {(isServer ? "servidor" : "cliente")} gerado![/] [blue]{pfxPath}[/]");
+        AnsiConsole.MarkupLine($"[green]Certificado de {(isServer ? "servidor" : "cliente")} gerado![/]");
+        AnsiConsole.MarkupLine($"  PFX: [blue]{pfxPath}[/]");
+        AnsiConsole.MarkupLine($"  CRT: [blue]{crtPath}[/]");
+        AnsiConsole.MarkupLine($"  KEY: [blue]{keyPath}[/]");
     }
 
     private static void RunShowThumbprint()

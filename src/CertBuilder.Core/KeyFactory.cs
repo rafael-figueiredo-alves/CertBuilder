@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
-using CertClientBuilder.Core.Models;
+using CertBuilder.Core.Models;
 
-namespace CertClientBuilder.Core;
+namespace CertBuilder.Core;
 
 /// <summary>
 /// Cria a chave assimétrica e a assinatura (algoritmo de hash + padding, quando aplicável)

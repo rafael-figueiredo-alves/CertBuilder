@@ -1,7 +1,7 @@
 using System.Reflection;
 using Spectre.Console;
 
-namespace CertClientBuilder.Cli;
+namespace CertBuilder.Cli;
 
 /// <summary>
 /// Lê os metadados definidos no .csproj (Version, Product, Copyright) para
@@ -12,7 +12,7 @@ internal static class VersionInfo
     private static readonly Assembly Assembly = typeof(VersionInfo).Assembly;
 
     public static string Product =>
-        Assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? "CertClientBuilder";
+        Assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? "CertBuilder";
 
     public static string Version =>
         Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
@@ -32,7 +32,7 @@ internal static class VersionInfo
             $"{Copyright}\n\n" +
             "Ferramenta de aprendizado para gerar CA raiz e certificados de\n" +
             "cliente/servidor (mTLS e SSL interno) usando System.Security.Cryptography.\n\n" +
-            "[link]https://github.com/rafael-figueiredo-alves/CertClientBuilder[/]")
+            "[link]https://github.com/rafael-figueiredo-alves/CertBuilder[/]")
             .Header("Sobre")
             .Border(BoxBorder.Rounded);
 

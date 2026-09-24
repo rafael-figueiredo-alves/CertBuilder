@@ -1,9 +1,9 @@
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using CertClientBuilder.Core.Models;
+using CertBuilder.Core.Models;
 
-namespace CertClientBuilder.Core;
+namespace CertBuilder.Core;
 
 /// <summary>
 /// Gera certificados de SERVIDOR, usados por um Kestrel/nginx/IIS para apresentar
@@ -25,9 +25,8 @@ public static class ServerCertGenerator
 
         var (key, hash) = KeyFactory.Create(options.KeyAlgorithm);
 
-        var subject = string.IsNullOrWhiteSpace(options.Organization)
-            ? $"CN={options.CommonName}"
-            : $"CN={options.CommonName}, O={options.Organization}";
+        var subject = CertificateSubjectBuilder.Build(options.CommonName, options.Organization,
+            options.OrganizationalUnit, options.Country, options.State, options.Locality);
 
         var request = CertificateRequestFactory.Create(subject, key, hash);
 

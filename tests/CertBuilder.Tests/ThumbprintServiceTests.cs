@@ -1,7 +1,7 @@
-using CertClientBuilder.Core;
+using CertBuilder.Core;
 using Xunit;
 
-namespace CertClientBuilder.Tests;
+namespace CertBuilder.Tests;
 
 public class ThumbprintServiceTests
 {

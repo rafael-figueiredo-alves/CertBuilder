@@ -1,7 +1,27 @@
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
-namespace CertClientBuilder.Core;
+namespace CertBuilder.Core;
+
+internal static class CertificateSubjectBuilder
+{
+    public static string Build(string commonName, string? organization, string? organizationalUnit,
+        string? country, string? state, string? locality)
+    {
+        var parts = new List<string> { $"CN={commonName}" };
+        Add(parts, "O", organization);
+        Add(parts, "OU", organizationalUnit);
+        Add(parts, "C", country);
+        Add(parts, "ST", state);
+        Add(parts, "L", locality);
+        return string.Join(", ", parts);
+    }
+
+    private static void Add(List<string> parts, string name, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value)) parts.Add($"{name}={value}");
+    }
+}
 
 /// <summary>
 /// CertificateRequest tem construtores diferentes para RSA e ECDSA — esta fábrica

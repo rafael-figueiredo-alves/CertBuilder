@@ -1,7 +1,8 @@
-using CertClientBuilder.Core;
+using System.Security.Cryptography.X509Certificates;
+using CertBuilder.Core;
 using Xunit;
 
-namespace CertClientBuilder.Tests;
+namespace CertBuilder.Tests;
 
 public class CertExporterTests : IDisposable
 {
@@ -34,15 +35,16 @@ public class CertExporterTests : IDisposable
     }
 
     [Fact]
-    public void ExportPem_DeveGerarArquivosDeCertificadoEChave()
+    public void ExportCrtAndKey_DeveGerarArquivosPemCarregaveis()
     {
         var ca = TestFixtures.CreateTestCa();
         var certPath = Path.Combine(_tempDir, "ca.crt");
         var keyPath = Path.Combine(_tempDir, "ca.key");
 
-        CertExporter.ExportPem(ca.Certificate, ca.PrivateKey, certPath, keyPath);
+        CertExporter.ExportCrtAndKey(ca.Certificate, ca.PrivateKey, certPath, keyPath);
 
-        Assert.Contains("BEGIN CERTIFICATE", File.ReadAllText(certPath));
+        var reloaded = X509Certificate2.CreateFromPemFile(certPath, keyPath);
+        Assert.Equal(ca.Certificate.Thumbprint, reloaded.Thumbprint);
         Assert.Contains("BEGIN PRIVATE KEY", File.ReadAllText(keyPath));
     }
 

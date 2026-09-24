@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <RootNamespace>CertClientBuilder.Tests</RootNamespace>
+    <RootNamespace>CertBuilder.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CertClientBuilder.Core\CertClientBuilder.Core.csproj" />
+    <ProjectReference Include="..\..\src\CertBuilder.Core\CertBuilder.Core.csproj" />
   </ItemGroup>
 
 </Project>

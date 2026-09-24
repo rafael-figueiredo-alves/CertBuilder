@@ -1,8 +1,9 @@
 using System.Security.Cryptography.X509Certificates;
-using CertClientBuilder.Core;
+using CertBuilder.Core;
+using CertBuilder.Core.Models;
 using Xunit;
 
-namespace CertClientBuilder.Tests;
+namespace CertBuilder.Tests;
 
 public class CaGeneratorTests
 {
@@ -41,5 +42,15 @@ public class CaGeneratorTests
 
         // Numa CA raiz autoassinada, Subject e Issuer são iguais.
         Assert.Equal(ca.Certificate.Subject, ca.Certificate.Issuer);
+    }
+
+    [Fact]
+    public void CreateRootCa_SemOpcoesDeIdentificacao_DeveUsarDefaultsBrasileiros()
+    {
+        var ca = CaGenerator.CreateRootCa(new CaOptions { PfxPassword = TestFixtures.CaPassword });
+
+        Assert.Contains("CN=CertBuilder Root CA", ca.Certificate.Subject);
+        Assert.Contains("C=BR", ca.Certificate.Subject);
+        Assert.Contains("O=CertBuilder", ca.Certificate.Subject);
     }
 }
